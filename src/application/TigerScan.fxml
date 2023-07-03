@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="aPane" prefHeight="730.0" prefWidth="735.0" xmlns="http://javafx.com/javafx/1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TigerScanController">
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER" spacing="4.0">
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+               <children>
+                  <Button fx:id="btnIcon" mnemonicParsing="false" onAction="#doImageCuteTiger">
+                     <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/CuteTiger.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Label text="TigerScan">
+                     <font>
+                        <Font name="System Bold" size="36.0" />
+                     </font>
+                  </Label>
+                  <VBox alignment="BOTTOM_LEFT">
+                     <children>
+                        <Label fx:id="lblVersion">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="4.0">
+               <children>
+                  <Label text="Timeout:">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="tfTimeout" prefWidth="55.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label text="in milliSeconds">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER_RIGHT" prefWidth="135.0" text="Cores Found:">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="cbThreads" prefWidth="75.0" style="-fx-font-size: 14px;">
+                     <tooltip>
+                        <Tooltip text="Select the number of threads to use.&#10;Defaults to number of cores." />
+                     </tooltip>
+                  </ChoiceBox>
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnHelp" mnemonicParsing="false" onAction="#doBtnHelp" prefWidth="75.0" text="Help">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnQuit" mnemonicParsing="false" onAction="#doBtnQuit" prefWidth="100.0" text="Quit">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

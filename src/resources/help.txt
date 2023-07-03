@@ -1,0 +1,21 @@
+The TigerScan program is used to scan for active IPv4 addresses on the selected subnet.
+
+The TigerScan utilizes the number of cores on the system.
+When the program starts up it grabs the number of cores and sets the 'Core ChoiceBox' field.
+
+For each core set in the 'Core ChoiceBox', I will start N threads to scan a subnet.
+
+The TigerScan program currently only scans Class 'C' subnets, but if enough people want the other class network types then let me know.
+
+Normally a single core can run two threads without much trouble, unless the system is already heavy loaded.
+So increasing the 'Core ChoiceBox' beyond the number of cores you have can be done but it may degrade performance of that scan.
+
+You can also scan multiple subnet at once but the total number of threads used is calculated
+    NumThreads = (numberOfSubnetToScan * Core ChoiceBox)
+
+The 'Timeout' field is how long the program will wait for each address being tested.  On a busy subnet you may have to increase the value to get a more accurate scan.
+The timeout is in milliseconds, 1000ms = 1 second.
+
+The top row of tabs are the different IPv4 interfaces found on your system.  When you click on an interface, it shows the display name and all subnets defined on your system in the second set of tabs.
+    
+I hope you find the program useful and if you have any comments or suggestions please email me.
