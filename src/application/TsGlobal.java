@@ -34,7 +34,19 @@ private static TsGlobal singleton = null;
 	}
 	
 	private void initGlobals() {
-		appVersion = "1.0.2";
+		appVersion = "1.0.3";
+		
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.contains("win") == true) {
+			osType = 1;
+		} else if (os.contains("nux") == true || 
+				os.contains("nix") == true || 
+				os.contains("aix") == true || 
+				os.contains("sunos") == true) {
+			osType = 2;
+		} else if (os.contains("mac") == true) {
+			osType = 3;
+		}
 		
 		sceneNav = new SceneNav();
 		
@@ -58,6 +70,8 @@ private static TsGlobal singleton = null;
 	public Image imgScan = null;
     public Image imgStop = null;
     public Image imgReset = null;
+    
+    public int osType;
 	
 	Alert alert = null;
 	public int timeout = 150;

@@ -149,7 +149,7 @@ public class TigerScanController implements Initializable, RefreshScene {
     	Tab tab = new Tab();
     	tab.setClosable(false);
     	tab.setText(ifAddr.getName());
-    	tab.setStyle("-fx-pref-width: 80; -fx-font-size: 16px;");
+    	tab.setStyle("-fx-pref-width: 100; -fx-font-size: 16px;");
     	
     	tabPane.getTabs().add(tab);
     	
@@ -193,7 +193,7 @@ public class TigerScanController implements Initializable, RefreshScene {
 		vb1.getChildren().addAll(hb1, tabPane2);
 		
 		for (String ip : ifAddr.getIps()) {
-			if (ip.charAt(0) == 'f' || ip.charAt(1) == ':' || ifAddr.isLoopback() == true)
+			if (ip.charAt(0) == 'f' || ip.indexOf(':') != -1 || ifAddr.isLoopback() == true)
     			continue;
 			
 			Tab tab2 = new Tab(ip);
@@ -261,6 +261,8 @@ public class TigerScanController implements Initializable, RefreshScene {
     			Label lbl = new Label(i + "");
         		lbl.setAlignment(Pos.CENTER);
         		lbl.setPrefWidth(40.0);
+        		if (tg.osType != 1)
+        			lbl.setPrefHeight(23.5);
         		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
         		lbl.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
         		lbl.setOnMouseClicked((e) -> {
