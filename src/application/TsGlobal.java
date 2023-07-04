@@ -34,7 +34,7 @@ private static TsGlobal singleton = null;
 	}
 	
 	private void initGlobals() {
-		appVersion = "1.0.1";
+		appVersion = "1.0.2";
 		
 		sceneNav = new SceneNav();
 		
@@ -46,6 +46,9 @@ private static TsGlobal singleton = null;
 		
 		InputStream stopImg = getClass().getResourceAsStream("/images/stop_hand.png");
 		imgStop = new Image(stopImg, 24, 24, false, false);
+		
+		InputStream resetImg = getClass().getResourceAsStream("/images/reset.png");
+		imgReset = new Image(resetImg, 24, 24, false, false);
 	}
 	
 	public String appVersion = null;
@@ -54,6 +57,7 @@ private static TsGlobal singleton = null;
 	
 	public Image imgScan = null;
     public Image imgStop = null;
+    public Image imgReset = null;
 	
 	Alert alert = null;
 	public int timeout = 150;

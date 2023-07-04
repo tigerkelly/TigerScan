@@ -1,10 +1,12 @@
 package application;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -18,6 +20,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -135,11 +140,11 @@ public class TigerScanController implements Initializable, RefreshScene {
 	        tg.ifAddrs.put(ifAddr.getName(), ifAddr);
 	        
 	        if (ifAddr.isLoopback() == false)
-	        	buildTab(ifAddr);
+	        	buildTab(netint, ifAddr);
         }
      }
     
-    void buildTab(IfAddr ifAddr) {
+    void buildTab(NetworkInterface iface, IfAddr ifAddr) {
     	
     	Tab tab = new Tab();
     	tab.setClosable(false);
@@ -221,6 +226,16 @@ public class TigerScanController implements Initializable, RefreshScene {
         		scanIP((Button)e.getSource());
         	});
         	
+        	Button btnReset = new Button("Reset");
+        	btnReset.setStyle("-fx-font-size: 15px;-fx-font-weight: bold;");
+    		btnReset.setGraphic(new ImageView(tg.imgReset));
+        	Tooltip tipReset = new Tooltip("Click to reset all addresses to pending.");
+        	tipReset.setStyle("-fx-font-size: 16px;");
+        	btnReset.setTooltip(tipReset);
+        	
+        	Label lblTxt = new Label("Click on # to test single address.");
+        	lblTxt.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: blue;");
+        	
 //        	ProgressBar pb = new ProgressBar();
 //        	pb.setProgress(0.0);
 //        	pb.setPrefWidth(600.0);
@@ -231,7 +246,8 @@ public class TigerScanController implements Initializable, RefreshScene {
         	HBox hb4 = new HBox();
         	
         	hb2.setPadding(new Insets(4));
-        	hb2.getChildren().add(btnScan);
+        	hb2.setSpacing(8.0);
+        	hb2.getChildren().addAll(lblTxt, btnReset, btnScan);
         	hb2.setAlignment(Pos.CENTER_RIGHT);
         	
         	vb2.getChildren().add(hb2);
@@ -246,8 +262,21 @@ public class TigerScanController implements Initializable, RefreshScene {
         		lbl.setAlignment(Pos.CENTER);
         		lbl.setPrefWidth(40.0);
         		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+        		lbl.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
+        		lbl.setOnMouseClicked((e) -> {
+        			Label l = (Label)e.getSource();
+        			getIpInfo(iface, l);
+        		});
         		fp.getChildren().add(lbl);
     		}
+        	
+        	btnReset.setOnAction(e -> {
+        		for (Node n : fp.getChildren()) {
+        			Label lbl = (Label)n;
+            		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+            		
+        		}
+        	});
     		
     		btnScan.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
     		
@@ -263,20 +292,32 @@ public class TigerScanController implements Initializable, RefreshScene {
     		
     		VBox.setVgrow(hb3, Priority.ALWAYS);
     		
+    		Label lblLedger = new Label("Color Ledger:");
+    		lblLedger.setStyle("-fx-font-size: 16px;");
+    		
     		Label lblPending = new Label("Pending");
     		lblPending.setPrefWidth(100.0);
     		lblPending.setAlignment(Pos.CENTER);
     		lblPending.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+    		Tooltip tipPending = new Tooltip("Address has not been scanned yet.");
+    		tipPending.setStyle("-fx-font-size: 16px;");
+    		lblPending.setTooltip(tipPending);
     		Label lblScanned = new Label("Found");
     		lblScanned.setPrefWidth(100.0);
     		lblScanned.setAlignment(Pos.CENTER);
     		lblScanned.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+    		Tooltip tipScanned = new Tooltip("Address has been scanned and was found.");
+    		tipScanned.setStyle("-fx-font-size: 16px;");
+    		lblScanned.setTooltip(tipScanned);
     		Label lblFound   = new Label("Not Found");
     		lblFound.setPrefWidth(100.0);
     		lblFound.setAlignment(Pos.CENTER);
     		lblFound.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
+    		Tooltip tipNotFound = new Tooltip("Address has been scanned but did NOT responded.");
+    		tipNotFound.setStyle("-fx-font-size: 16px;");
+    		lblFound.setTooltip(tipNotFound);
     		
-    		hb4.getChildren().addAll(lblPending, lblScanned, lblFound);
+    		hb4.getChildren().addAll(lblLedger, lblPending, lblScanned, lblFound);
     		
     		hb4.setSpacing(4.0);
     		hb4.setAlignment(Pos.CENTER_LEFT);
@@ -294,7 +335,45 @@ public class TigerScanController implements Initializable, RefreshScene {
 		AnchorPane.setTopAnchor(vb1, 0.0);
 		AnchorPane.setLeftAnchor(vb1, 0.0);
 		AnchorPane.setRightAnchor(vb1, 0.0);
-    } 
+    }
+    
+    private void getIpInfo(NetworkInterface iface, Label lbl) {
+    	String octal = lbl.getText();
+    	
+    	TabInfo ti = (TabInfo)lbl.getUserData();
+    	String ip = ti.getIp();
+    	
+    	String[] a = ip.split("\\.");
+    	
+    	String addr = a[0] + "." + a[1] + "." + a[2] + "." + octal;
+    	
+    	Stage stage = (Stage)lbl.getScene().getWindow();
+    	stage.getScene().setCursor(Cursor.WAIT);
+    	
+		new Thread(() -> {
+			try {
+				int timeout = 0;
+		    	try {
+		    		timeout = Integer.parseInt(tfTimeout.getText());
+		    	}  catch (NumberFormatException nfe) {
+		    		tg.showAlert("User Error", "Timeout is invalid.", AlertType.ERROR, false);
+		    		return;
+		    	}
+		    	
+				InetAddress inet = InetAddress.getByName(addr);
+				if (inet.isReachable(timeout) == true)
+	    			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+	    		else
+	    			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
+				
+				stage.getScene().setCursor(Cursor.DEFAULT);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}).start();
+    }
     
     private void scanIP(Button scan) {
     	if (scan == null)
