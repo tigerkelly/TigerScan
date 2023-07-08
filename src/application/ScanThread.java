@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 
@@ -51,14 +52,41 @@ public class ScanThread extends Thread {
 			try {
 				InetAddress inet = InetAddress.getByName(addr);
 				boolean status = inet.isReachable(timeout);
+				
+				String vendor = null;
+				try {
+					String mac = tg.macLookup.getMacAddrHost(addr);
+					if (mac != null) {
+						mac = mac.replaceAll("-", ":");
+						vendor = tg.macs.get(mac.substring(0, 8));
+					}
+					
+//					System.out.println("mac = " + mac.substring(0, 8));
+//					System.out.println("Vendor = " + vendor);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				final String ven = vendor;
 
 				Platform.runLater(new Runnable() {
                     @Override
 					public void run() {
-                		if (status == true)
-                			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
-                		else
+                		if (status == true) {
+                			if (ven != null) {
+            					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
+            					if (lbl.getTooltip() == null) {
+            						Tooltip tt = new Tooltip(ven);
+            						lbl.setTooltip(tt);
+            					} else {
+            						lbl.getTooltip().setText(ven);
+            					}
+            				} else {
+            					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+            				}
+                		} else {
                 			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
+                		}
                     }
                 });
 			} catch (UnknownHostException e) {

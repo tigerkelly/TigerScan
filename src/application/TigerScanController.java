@@ -56,6 +56,9 @@ public class TigerScanController implements Initializable, RefreshScene {
     private Button btnQuit;
     
     @FXML
+    private Button btnMacs;
+    
+    @FXML
     private ImageView imageCuteTiger;
     
     @FXML
@@ -71,6 +74,13 @@ public class TigerScanController implements Initializable, RefreshScene {
     }
     
     @FXML
+    void doBtnMacs(ActionEvent event) {
+    	tg.centerScene(aPane, "EditMacs.fxml", "Edit MAC Addresses", null);
+    	
+    	tg.loadMacs();
+    }
+    
+    @FXML
     void doImageCuteTiger(ActionEvent event) {
     	tg.centerScene(aPane, "About.fxml", "About TigerScan", null);
     }
@@ -83,6 +93,8 @@ public class TigerScanController implements Initializable, RefreshScene {
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
+    	tg.macLookup = new MacLookup();
+    	
 		lblVersion.setText(tg.appVersion);
 		tfTimeout.setText(tg.timeout + "");
 		
@@ -116,6 +128,10 @@ public class TigerScanController implements Initializable, RefreshScene {
         
         ArrayList<InetAddress> addrs = Collections.list(inetAddresses);
         if (addrs.size() > 0) {
+        	
+//        	byte[] hw = netint.getHardwareAddress();
+//            if (hw != null)
+//            	System.out.printf("%s - %02x:%02x:%02x:%02x:%02x:%02x\n", netint.getName(), hw[0], hw[1], hw[2], hw[3], hw[4], hw[5]);
         
 	        IfAddr ifAddr = new IfAddr();
 	        ifAddr.setName(netint.getName());
@@ -363,12 +379,35 @@ public class TigerScanController implements Initializable, RefreshScene {
 		    	}
 		    	
 				InetAddress inet = InetAddress.getByName(addr);
-				if (inet.isReachable(timeout) == true)
-	    			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
-	    		else
+				if (inet.isReachable(timeout) == true) {
+					String vendor = null;
+					try {
+						String mac = tg.macLookup.getMacAddrHost(addr).replaceAll("-", ":");
+						vendor = tg.macs.get(mac.substring(0, 8));
+						
+//						System.out.println("mac = " + mac.substring(0, 8));
+//						System.out.println("Vendor = " + vendor);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
+					if (vendor != null) {
+						lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
+						if (lbl.getTooltip() == null) {
+							Tooltip tt = new Tooltip(vendor);
+							lbl.setTooltip(tt);
+						} else {
+							lbl.getTooltip().setText(vendor);
+						}
+					} else {
+						lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+					}
+				} else {
 	    			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
+				}
 				
 				stage.getScene().setCursor(Cursor.DEFAULT);
+				
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

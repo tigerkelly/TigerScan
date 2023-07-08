@@ -16,6 +16,10 @@ You can also scan multiple subnet at once but the total number of threads used i
 The 'Timeout' field is how long the program will wait for each address being tested.  On a busy subnet you may have to increase the value to get a more accurate scan.
 The timeout is in milliseconds, 1000ms = 1 second.
 
+The 'MACs' button allows you to add known MAC addresses.  If the addresses MAC vendor ID matches your list of known MACs then the text will turn yellow with a green background.
+Hovering you mouse over the address label will display the vendor name you entered.
+I comes pre-loaded with the Raspberry Ltd Vendor IDs.
+
 The top row of tabs are the different IPv4 interfaces found on your system.  When you click on an interface, it shows the display name and all subnets defined on your system in the second set of tabs.
     
 I hope you find the program useful and if you have any comments or suggestions please email me.

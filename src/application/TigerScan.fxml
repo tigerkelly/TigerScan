@@ -82,6 +82,11 @@
                      </tooltip>
                   </ChoiceBox>
                   <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnMacs" mnemonicParsing="false" onAction="#doBtnMacs" text="MACs">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Button>
                   <Button fx:id="btnHelp" mnemonicParsing="false" onAction="#doBtnHelp" prefWidth="75.0" text="Help">
                      <font>
                         <Font name="System Bold" size="18.0" />
