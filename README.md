@@ -19,3 +19,6 @@ Program features:
 - Can run on both windows and linux.
 
 ![Scanning image](src/images/tigerscan_scanning.png?raw=true)
+
+The install programs are too large for github, so if you want the install for windows or linux x64 email me at rkwiles@twc.com
+I will send you a link.
