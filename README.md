@@ -14,7 +14,8 @@ Program features:
 - Can scan a single address just by clicking on it.
 - A list of MAC vendor IDs defined by the user.
 - If a user's MAC ID is found it changes the label to a yellow text with a green background and if you hover your mouse over label it gives you the vendor name you defined.
-	* This allows me to find all my Raspberry Pi system quickly.
+	* This allows me to find all my Raspberry Pi systems quickly.
 - Can scan more than one subnet at a time.
+- Can run on both windows and linux.
 
 ![Scanning image](src/images/tigerscan_scanning.png?raw=true)

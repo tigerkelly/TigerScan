@@ -35,7 +35,7 @@
                   </Button>
                   <Label text="TigerScan">
                      <font>
-                        <Font name="System Bold" size="36.0" />
+                        <Font name="SansSerif Bold" size="36.0" />
                      </font>
                   </Label>
                   <VBox alignment="BOTTOM_LEFT">
@@ -58,7 +58,7 @@
                <children>
                   <Label text="Timeout:">
                      <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Label>
                   <TextField fx:id="tfTimeout" prefWidth="55.0">
@@ -73,10 +73,10 @@
                   </Label>
                   <Label alignment="CENTER_RIGHT" prefWidth="135.0" text="Cores Found:">
                      <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Label>
-                  <ChoiceBox fx:id="cbThreads" prefWidth="75.0" style="-fx-font-size: 14px;">
+                  <ChoiceBox fx:id="cbThreads" prefWidth="65.0" style="-fx-font-size: 14px;">
                      <tooltip>
                         <Tooltip text="Select the number of threads to use.&#10;Defaults to number of cores." />
                      </tooltip>
@@ -84,17 +84,17 @@
                   <Region HBox.hgrow="ALWAYS" />
                   <Button fx:id="btnMacs" mnemonicParsing="false" onAction="#doBtnMacs" text="MACs">
                      <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Button>
                   <Button fx:id="btnHelp" mnemonicParsing="false" onAction="#doBtnHelp" prefWidth="75.0" text="Help">
                      <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Button>
                   <Button fx:id="btnQuit" mnemonicParsing="false" onAction="#doBtnQuit" prefWidth="100.0" text="Quit">
                      <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Button>
                </children>

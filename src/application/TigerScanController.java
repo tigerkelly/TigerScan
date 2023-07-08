@@ -59,6 +59,12 @@ public class TigerScanController implements Initializable, RefreshScene {
     private Button btnMacs;
     
     @FXML
+    private Button btnHelp;
+    
+    @FXML
+    private Button btnIcon;
+    
+    @FXML
     private ImageView imageCuteTiger;
     
     @FXML
