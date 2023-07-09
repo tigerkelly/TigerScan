@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="aPane" prefHeight="225.0" prefWidth="665.0" xmlns="http://javafx.com/javafx/1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LedgerController">
+<AnchorPane fx:id="aPane" prefHeight="225.0" prefWidth="775.0" xmlns="http://javafx.com/javafx/1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.LedgerController">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -19,7 +19,7 @@
                <children>
                   <Label text="Color Ledger">
                      <font>
-                        <Font name="System Bold" size="24.0" />
+                        <Font name="Sans-Serif Bold" size="24.0" />
                      </font>
                   </Label>
                </children>
@@ -31,12 +31,12 @@
                <children>
                   <Label alignment="CENTER" prefWidth="125.0" style="-fx-border-color: black; -fx-background-color: yellow;" text="Pending">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                   <Label text="Has not been scanned yet, it is pending.">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                </children>
@@ -48,12 +48,12 @@
                <children>
                   <Label alignment="CENTER" prefWidth="125.0" style="-fx-border-color: black; -fx-background-color: lightgreen;" text="Found">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                   <Label text="Has been scanned and it responded.">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                </children>
@@ -65,12 +65,12 @@
                <children>
                   <Label alignment="CENTER" prefWidth="125.0" style="-fx-border-color: black; -fx-background-color: lightgreen; -fx-text-fill: yellow;" text="Found">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                   <Label text="Has been scanned and it responded and it matches a vendor ID.">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                </children>
@@ -82,12 +82,12 @@
                <children>
                   <Label alignment="CENTER" prefWidth="125.0" style="-fx-border-color: black; -fx-background-color: #aaaaff; -fx-text-fill: yellow;" text="Found">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                   <Label text="Has been scanned and it responded and it matches a MAC address.">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                </children>
@@ -99,12 +99,12 @@
                <children>
                   <Label alignment="CENTER" prefWidth="125.0" style="-fx-border-color: black; -fx-text-fill: black;" text="Not Found">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                   <Label text="Has been scanned but did not respond.">
                      <font>
-                        <Font name="System Bold" size="16.0" />
+                        <Font name="Sans-Serif Bold" size="16.0" />
                      </font>
                   </Label>
                </children>
@@ -113,7 +113,7 @@
                <children>
                   <Button fx:id="btnClose" mnemonicParsing="false" onAction="#doBtnClose" prefWidth="125.0" text="Close">
                      <font>
-                        <Font name="System Bold" size="18.0" />
+                        <Font name="Sans-Serif Bold" size="18.0" />
                      </font>
                   </Button>
                </children>
