@@ -54,11 +54,24 @@ public class ScanThread extends Thread {
 				boolean status = inet.isReachable(timeout);
 				
 				String vendor = null;
+				String name = null;
+				String ttStr = null;
 				try {
 					String mac = tg.macLookup.getMacAddrHost(addr);
 					if (mac != null) {
 						mac = mac.replaceAll("-", ":");
-						vendor = tg.macs.get(mac.substring(0, 8));
+						vendor = tg.vendors.get(mac.substring(0, 8));
+						name = tg.macs.get(mac);
+					}
+					
+					if (name != null)
+						ttStr = "Name: " + name;
+					
+					if (vendor != null) {
+						if (ttStr == null)
+							ttStr = "Vendor: " + vendor;
+						else
+							ttStr += "\nVendor: " + vendor;
 					}
 					
 //					System.out.println("mac = " + mac.substring(0, 8));
@@ -67,14 +80,17 @@ public class ScanThread extends Thread {
 					e.printStackTrace();
 				}
 				
-				final String ven = vendor;
+				final String ven = ttStr;
 
 				Platform.runLater(new Runnable() {
                     @Override
 					public void run() {
                 		if (status == true) {
                 			if (ven != null) {
-            					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
+                				if (ven.startsWith("Name:") == true)
+                					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
+                				else
+                					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
             					if (lbl.getTooltip() == null) {
             						Tooltip tt = new Tooltip(ven);
             						lbl.setTooltip(tt);

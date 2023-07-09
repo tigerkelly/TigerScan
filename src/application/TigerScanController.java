@@ -316,32 +316,44 @@ public class TigerScanController implements Initializable, RefreshScene {
     		
     		VBox.setVgrow(hb3, Priority.ALWAYS);
     		
-    		Label lblLedger = new Label("Color Ledger:");
-    		lblLedger.setStyle("-fx-font-size: 16px;");
+    		Button btnLedger = new Button("Color Ledger");
+    		btnLedger.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+    		btnLedger.setOnAction(e -> {
+    			tg.centerScene(aPane, "Ledger.fxml", "TigerScan Color Ledger", null);
+        	});
+//    		Label lblLedger = new Label("Color Ledger:");
+//    		lblLedger.setStyle("-fx-font-size: 16px;");
     		
-    		Label lblPending = new Label("Pending");
-    		lblPending.setPrefWidth(100.0);
-    		lblPending.setAlignment(Pos.CENTER);
-    		lblPending.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
-    		Tooltip tipPending = new Tooltip("Address has not been scanned yet.");
-    		tipPending.setStyle("-fx-font-size: 16px;");
-    		lblPending.setTooltip(tipPending);
-    		Label lblScanned = new Label("Found");
-    		lblScanned.setPrefWidth(100.0);
-    		lblScanned.setAlignment(Pos.CENTER);
-    		lblScanned.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
-    		Tooltip tipScanned = new Tooltip("Address has been scanned and was found.");
-    		tipScanned.setStyle("-fx-font-size: 16px;");
-    		lblScanned.setTooltip(tipScanned);
-    		Label lblFound   = new Label("Not Found");
-    		lblFound.setPrefWidth(100.0);
-    		lblFound.setAlignment(Pos.CENTER);
-    		lblFound.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
-    		Tooltip tipNotFound = new Tooltip("Address has been scanned but did NOT responded.");
-    		tipNotFound.setStyle("-fx-font-size: 16px;");
-    		lblFound.setTooltip(tipNotFound);
+//    		Label lblPending = new Label("Pending");
+//    		lblPending.setPrefWidth(100.0);
+//    		lblPending.setAlignment(Pos.CENTER);
+//    		lblPending.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+//    		Tooltip tipPending = new Tooltip("Address has not been scanned yet.");
+//    		tipPending.setStyle("-fx-font-size: 16px;");
+//    		lblPending.setTooltip(tipPending);
+//    		Label lblScanned = new Label("Found");
+//    		lblScanned.setPrefWidth(100.0);
+//    		lblScanned.setAlignment(Pos.CENTER);
+//    		lblScanned.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+//    		Tooltip tipScanned = new Tooltip("Address has been scanned and was found.");
+//    		tipScanned.setStyle("-fx-font-size: 16px;");
+//    		lblScanned.setTooltip(tipScanned);
+//    		Label lblInfo = new Label("Found");
+//    		lblInfo.setPrefWidth(100.0);
+//    		lblInfo.setAlignment(Pos.CENTER);
+//    		lblInfo.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
+//    		Tooltip tipInfo = new Tooltip("Address has been scanned and was found, plus has info.");
+//    		tipScanned.setStyle("-fx-font-size: 16px;");
+//    		lblScanned.setTooltip(tipInfo);
+//    		Label lblNotFound   = new Label("Not Found");
+//    		lblNotFound.setPrefWidth(100.0);
+//    		lblNotFound.setAlignment(Pos.CENTER);
+//    		lblNotFound.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
+//    		Tooltip tipNotFound = new Tooltip("Address has been scanned but did NOT responded.");
+//    		tipNotFound.setStyle("-fx-font-size: 16px;");
+//    		lblNotFound.setTooltip(tipNotFound);
     		
-    		hb4.getChildren().addAll(lblLedger, lblPending, lblScanned, lblFound);
+    		hb4.getChildren().addAll(btnLedger);
     		
     		hb4.setSpacing(4.0);
     		hb4.setAlignment(Pos.CENTER_LEFT);
@@ -387,23 +399,38 @@ public class TigerScanController implements Initializable, RefreshScene {
 				InetAddress inet = InetAddress.getByName(addr);
 				if (inet.isReachable(timeout) == true) {
 					String vendor = null;
+					String name = null;
+					String ttStr = null;
 					try {
 						String mac = tg.macLookup.getMacAddrHost(addr).replaceAll("-", ":");
-						vendor = tg.macs.get(mac.substring(0, 8));
+						vendor = tg.vendors.get(mac.substring(0, 8));
+						name = tg.macs.get(mac);
 						
-//						System.out.println("mac = " + mac.substring(0, 8));
+						if (name != null)
+							ttStr = "Name: " + name;
+						if (vendor != null) {
+							if (ttStr == null)
+								ttStr = "Vendor: " + vendor;
+							else
+								ttStr += "\nVendor: " + vendor;
+						}
+						
+//						System.out.println("Name = " + name);
 //						System.out.println("Vendor = " + vendor);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 					
-					if (vendor != null) {
-						lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
+					if (ttStr != null) {
+						if (name != null)
+							lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
+						else
+							lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
 						if (lbl.getTooltip() == null) {
-							Tooltip tt = new Tooltip(vendor);
+							Tooltip tt = new Tooltip(ttStr);
 							lbl.setTooltip(tt);
 						} else {
-							lbl.getTooltip().setText(vendor);
+							lbl.getTooltip().setText(ttStr);
 						}
 					} else {
 						lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");

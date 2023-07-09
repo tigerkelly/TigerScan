@@ -38,7 +38,7 @@ private static TsGlobal singleton = null;
 	}
 	
 	private void initGlobals() {
-		appVersion = "1.0.5";
+		appVersion = "1.0.6";
 		
 		String os = System.getProperty("os.name").toLowerCase();
 		if (os.contains("win") == true) {
@@ -56,12 +56,12 @@ private static TsGlobal singleton = null;
 		if (base.exists() == false)
 			base.mkdirs();
 		
-		macFile = new File(base.getAbsolutePath() + File.separator + "macs.txt");
-		if (macFile.exists() == false) {
+		vendorFile = new File(base.getAbsolutePath() + File.separator + "vendors.txt");
+		if (vendorFile.exists() == false) {
 			try {
-				macFile.createNewFile();
+				vendorFile.createNewFile();
 				
-				FileWriter w = new FileWriter(macFile.getAbsolutePath());
+				FileWriter w = new FileWriter(vendorFile.getAbsolutePath());
 				w.write("# Known MAC vendor IDs. Format 00:00:00,Vendor name\n");
 				w.write("B8:27:EB,Raspberry Pi Foundation\n");
 				w.write("DC:A6:32,Raspberry Pi Trading Ltd\n");
@@ -69,6 +69,25 @@ private static TsGlobal singleton = null;
 				w.write("E4:5F:01,Raspberry Pi Trading Ltd\n");
 				w.write("28:CD:C1,Raspberry Pi Trading Ltd\n");
 				w.write("D8:3A:DD,Raspberry Pi Trading Ltd\n");
+				
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		vendors = new HashMap<String, String>();
+		
+		loadVendors();
+		
+		macFile = new File(base.getAbsolutePath() + File.separator + "macs.txt");
+		if (macFile.exists() == false) {
+			try {
+				macFile.createNewFile();
+				
+				FileWriter w = new FileWriter(macFile.getAbsolutePath());
+				w.write("# Known MACs. Format 00:00:00:00:00:00,name\n");
+				w.write("d8:9e:f3:14:e2:ff,DPDK\n");
 				
 				w.close();
 			} catch (IOException e) {
@@ -100,6 +119,7 @@ private static TsGlobal singleton = null;
 	public Map<String, ScanThread> scans = null;
 	
 	public Map<String, String> macs = null;
+	public Map<String, String> vendors = null;
 	
 	public MacLookup macLookup = null;
 	
@@ -109,6 +129,7 @@ private static TsGlobal singleton = null;
     
     public int osType;
     
+    public File vendorFile = null;
     public File macFile = null;
 	
 	Alert alert = null;
@@ -143,6 +164,31 @@ private static TsGlobal singleton = null;
 		if (sceneNav.loadScene(fxml) == true) {
 			guiRestart(fxml);
 		}
+	}
+	
+	public void loadVendors() {
+		
+		try {
+			List<String> allLines = Files.readAllLines(Paths.get(vendorFile.getAbsolutePath()));
+
+			for (String line : allLines) {
+				line = line.trim();
+				if (line.length() <= 0)
+					continue;
+				if (line.charAt(0) == '#')
+					continue;
+				
+				String[] arr = line.split(",");
+				if (arr.length >= 2)
+					vendors.put(arr[0].toLowerCase(), arr[1]);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+//		for (String key : macs.keySet()) {
+//			System.out.println(key + ", " + macs.get(key));
+//		}
 	}
 	
 	public void loadMacs() {

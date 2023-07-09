@@ -28,10 +28,14 @@ public class EditMacsController implements Initializable, RefreshScene {
     private Button btnSave;
 
     @FXML
-    private TextArea taScript;
+    private TextArea taVendors;
+    
+    @FXML
+    private TextArea taMacs;
     
 //    private JpGlobal tg = JpGlobal.getInstance();
     private File macFile = null;
+    private File vendorFile = null;
 
     @FXML
     void doBtnCancel(ActionEvent event) {
@@ -43,9 +47,17 @@ public class EditMacsController implements Initializable, RefreshScene {
     void doBtnSave(ActionEvent event) {
     	
 		try {
+			FileWriter w = new FileWriter(vendorFile.getAbsolutePath(), false);
+			
+			w.write(taVendors.getText());
+			w.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
 			FileWriter w = new FileWriter(macFile.getAbsolutePath(), false);
 			
-			w.write(taScript.getText());
+			w.write(taMacs.getText());
 			w.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -57,6 +69,24 @@ public class EditMacsController implements Initializable, RefreshScene {
     @Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
     	
+    	vendorFile = new File(System.getProperty("user.home") + File.separator + "TigerScan" + File.separator + "vendors.txt");
+    	
+    	if (vendorFile.exists() == true) {
+	    	try {
+				FileInputStream fis = new FileInputStream(vendorFile);
+				byte[] data = new byte[(int) vendorFile.length()];
+		    	fis.read(data);
+		    	fis.close();
+		    	String str = new String(data, "UTF-8");
+		    	
+		    	taVendors.setText(str);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
     	macFile = new File(System.getProperty("user.home") + File.separator + "TigerScan" + File.separator + "macs.txt");
     	
     	if (macFile.exists() == true) {
@@ -67,7 +97,7 @@ public class EditMacsController implements Initializable, RefreshScene {
 		    	fis.close();
 		    	String str = new String(data, "UTF-8");
 		    	
-		    	taScript.setText(str);
+		    	taMacs.setText(str);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
