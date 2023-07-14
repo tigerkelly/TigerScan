@@ -38,7 +38,7 @@ private static TsGlobal singleton = null;
 	}
 	
 	private void initGlobals() {
-		appVersion = "1.0.6";
+		appVersion = "1.0.7";
 		
 		String os = System.getProperty("os.name").toLowerCase();
 		if (os.contains("win") == true) {
@@ -112,11 +112,15 @@ private static TsGlobal singleton = null;
 		
 		InputStream resetImg = getClass().getResourceAsStream("/images/reset.png");
 		imgReset = new Image(resetImg, 24, 24, false, false);
+		
+		safeCounter = new Counter();
 	}
 	
 	public String appVersion = null;
 	public Map<String, IfAddr> ifAddrs = null;
 	public Map<String, ScanThread> scans = null;
+	
+	public Counter safeCounter = null;
 	
 	public Map<String, String> macs = null;
 	public Map<String, String> vendors = null;
@@ -128,6 +132,7 @@ private static TsGlobal singleton = null;
     public Image imgReset = null;
     
     public int osType;
+    public boolean scanRunning = false;
     
     public File vendorFile = null;
     public File macFile = null;

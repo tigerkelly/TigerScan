@@ -66,19 +66,19 @@
                         <Font size="14.0" />
                      </font>
                   </TextField>
-                  <Label text="in milliSeconds">
+                  <Label text="ms">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" prefWidth="135.0" text="Cores Found:">
+                  <Label alignment="CENTER_RIGHT" prefWidth="115.0" text="Cores Found:">
                      <font>
                         <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Label>
-                  <ChoiceBox fx:id="cbThreads" prefWidth="65.0" style="-fx-font-size: 14px;">
+                  <ChoiceBox fx:id="cbThreads" prefWidth="65.0" style="-fx-font-size: 14px; -fx-font-family: SanSerif;">
                      <tooltip>
-                        <Tooltip text="Select the number of threads to use.&#10;Defaults to number of cores." />
+                        <Tooltip text="Select the number of threads to use.&#10;Defaults to number of cores." style="-fx-font-size: 16px;" />
                      </tooltip>
                   </ChoiceBox>
                   <Region HBox.hgrow="ALWAYS" />

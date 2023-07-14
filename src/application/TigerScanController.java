@@ -13,6 +13,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -245,7 +246,16 @@ public class TigerScanController implements Initializable, RefreshScene {
         	tip2.setStyle("-fx-font-size: 16px;");
         	btnScan.setTooltip(tip2);
         	btnScan.setOnAction(e -> {
-        		scanIP((Button)e.getSource());
+        		String txt = btnScan.getText();
+        		if (tg.scanRunning == false && txt.equals("Scan") == true)
+        			scanIP((Button)e.getSource());
+        		else if (txt.equals("Stop") == true) {
+        			for (String key : tg.scans.keySet()) {
+        		    	ScanThread st = tg.scans.get(key);
+        		    	st.setStopThread();
+        	    	}
+        			tg.scans.clear();
+        		}
         	});
         	
         	Button btnReset = new Button("Reset");
@@ -257,10 +267,6 @@ public class TigerScanController implements Initializable, RefreshScene {
         	
         	Label lblTxt = new Label("Click on # to test single address.");
         	lblTxt.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: blue;");
-        	
-//        	ProgressBar pb = new ProgressBar();
-//        	pb.setProgress(0.0);
-//        	pb.setPrefWidth(600.0);
         	
         	HBox hb2 = new HBox();
         	hb2.setSpacing(4.0);
@@ -288,29 +294,26 @@ public class TigerScanController implements Initializable, RefreshScene {
         		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
         		lbl.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
         		lbl.setOnMouseClicked((e) -> {
-        			Label l = (Label)e.getSource();
-        			getIpInfo(iface, l);
+        			if (tg.scanRunning == false) {
+	        			Label l = (Label)e.getSource();
+	        			getIpInfo(iface, l);
+        			}
         		});
         		fp.getChildren().add(lbl);
     		}
         	
         	btnReset.setOnAction(e -> {
-        		for (Node n : fp.getChildren()) {
-        			Label lbl = (Label)n;
-            		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
-            		
+        		if (tg.scanRunning == false) {
+	        		for (Node n : fp.getChildren()) {
+	        			Label lbl = (Label)n;
+	            		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+	        		}
         		}
         	});
     		
     		btnScan.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
     		
     		hb3.getChildren().add(fp);
-    		
-//    		hb3.setStyle("-fx-padding: 4;" + 
-//                    "-fx-border-style: solid inside;" + 
-//                    "-fx-border-width: 2;" +
-//                    "-fx-border-insets: 2;" + 
-//                    "-fx-border-color: green;");
     		
     		HBox.setHgrow(fp, Priority.ALWAYS);
     		
@@ -321,37 +324,6 @@ public class TigerScanController implements Initializable, RefreshScene {
     		btnLedger.setOnAction(e -> {
     			tg.centerScene(aPane, "Ledger.fxml", "TigerScan Color Ledger", null);
         	});
-//    		Label lblLedger = new Label("Color Ledger:");
-//    		lblLedger.setStyle("-fx-font-size: 16px;");
-    		
-//    		Label lblPending = new Label("Pending");
-//    		lblPending.setPrefWidth(100.0);
-//    		lblPending.setAlignment(Pos.CENTER);
-//    		lblPending.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
-//    		Tooltip tipPending = new Tooltip("Address has not been scanned yet.");
-//    		tipPending.setStyle("-fx-font-size: 16px;");
-//    		lblPending.setTooltip(tipPending);
-//    		Label lblScanned = new Label("Found");
-//    		lblScanned.setPrefWidth(100.0);
-//    		lblScanned.setAlignment(Pos.CENTER);
-//    		lblScanned.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
-//    		Tooltip tipScanned = new Tooltip("Address has been scanned and was found.");
-//    		tipScanned.setStyle("-fx-font-size: 16px;");
-//    		lblScanned.setTooltip(tipScanned);
-//    		Label lblInfo = new Label("Found");
-//    		lblInfo.setPrefWidth(100.0);
-//    		lblInfo.setAlignment(Pos.CENTER);
-//    		lblInfo.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
-//    		Tooltip tipInfo = new Tooltip("Address has been scanned and was found, plus has info.");
-//    		tipScanned.setStyle("-fx-font-size: 16px;");
-//    		lblScanned.setTooltip(tipInfo);
-//    		Label lblNotFound   = new Label("Not Found");
-//    		lblNotFound.setPrefWidth(100.0);
-//    		lblNotFound.setAlignment(Pos.CENTER);
-//    		lblNotFound.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
-//    		Tooltip tipNotFound = new Tooltip("Address has been scanned but did NOT responded.");
-//    		tipNotFound.setStyle("-fx-font-size: 16px;");
-//    		lblNotFound.setTooltip(tipNotFound);
     		
     		hb4.getChildren().addAll(btnLedger);
     		
@@ -402,22 +374,28 @@ public class TigerScanController implements Initializable, RefreshScene {
 					String name = null;
 					String ttStr = null;
 					try {
-						String mac = tg.macLookup.getMacAddrHost(addr).replaceAll("-", ":");
-						vendor = tg.vendors.get(mac.substring(0, 8));
-						name = tg.macs.get(mac);
+						String mac = tg.macLookup.getMacAddrHost(addr);
+						if (mac != null) {
+							mac = mac.replaceAll("-", ":");
 						
-						if (name != null)
-							ttStr = "Name: " + name;
-						if (vendor != null) {
-							if (ttStr == null)
-								ttStr = "Vendor: " + vendor;
-							else
-								ttStr += "\nVendor: " + vendor;
+							vendor = tg.vendors.get(mac.substring(0, 8));
+							name = tg.macs.get(mac);
+							
+							if (name != null)
+								ttStr = "Name: " + name;
+							if (vendor != null) {
+								if (ttStr == null)
+									ttStr = "Vendor: " + vendor;
+								else
+									ttStr += "\nVendor: " + vendor;
+							}
+							
+	//						System.out.println("Name = " + name);
+	//						System.out.println("Vendor = " + vendor);
 						}
-						
-//						System.out.println("Name = " + name);
-//						System.out.println("Vendor = " + vendor);
 					} catch (InterruptedException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
 					
@@ -453,8 +431,37 @@ public class TigerScanController implements Initializable, RefreshScene {
     	if (scan == null)
     		return;
     	
+    	tg.scanRunning = true;
+    	
     	TabInfo ti = (TabInfo)scan.getUserData();
     	String ip = ti.getIp();
+    	
+    	int numThreads = Integer.parseInt(cbThreads.getValue());
+    	
+    	tg.safeCounter.set(0);
+    	
+    	// Small thread to wait for all threads to stop.
+    	new Thread(() -> {
+    		while (true) {
+				if (tg.safeCounter.getValue() == numThreads) {
+					Platform.runLater(new Runnable() {
+	                    @Override
+						public void run() {
+	                    	scan.setText("Scan");
+	                    	scan.setGraphic(new ImageView(tg.imgScan));
+	                    }
+	                });
+					tg.scanRunning = false;
+					break;
+				}
+				
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+    		}
+		}).start();
     	
     	// For now only do the last octal 1 - 254
     	
@@ -462,25 +469,7 @@ public class TigerScanController implements Initializable, RefreshScene {
     	scan.setGraphic(new ImageView(tg.imgStop));
     	
     	FlowPane fp = ti.getFp();
-    	
-    	int numThreads = Integer.parseInt(cbThreads.getValue());
-    	
-    	boolean retFlag = false;
-    	for (int k = 1; k <= numThreads; k++) {
-	    	if (tg.scans.containsKey(ip + "-" + k) == true) {
-	    		retFlag = true;
-	    		ScanThread st = (ScanThread)tg.scans.get(ip + "-" + k);
-	    		st.setStopThread();
-//	    		tg.scans.remove(ip + "-" + k);
-	    	}
-    	}
-    	
-    	if (retFlag == true) {
-	    	scan.setText("Scan");
-	    	scan.setGraphic(new ImageView(tg.imgScan));
-	    	return;
-    	}
-    	
+	    	
     	for (int i = 1; i <= 254; i++) {
     		Label lbl = (Label)fp.getChildren().get(i-1);
     		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: yellow; -fx-border-color: black;");
@@ -498,9 +487,8 @@ public class TigerScanController implements Initializable, RefreshScene {
     	}
     	
     	int num = (256 / numThreads);
-//    	int rm = (256 % numThreads);
     	
-//    	System.out.println(numThreads + " = " + num + "," + rm);
+//	    	System.out.println(numThreads + " = " + num);
     	
     	int start = 1;
     	int end = num;
@@ -508,16 +496,16 @@ public class TigerScanController implements Initializable, RefreshScene {
     		
     		if (k == numThreads) {
     			end = 254;
-		    	ScanThread st1 = new ScanThread(ti, k, timeout, scan, start, 254);
+		    	ScanThread st1 = new ScanThread(ti, k, timeout, start, 254);
 		    	st1.start();
 		    	tg.scans.put(ip + "-" + k,  st1);
     		} else {
-    			ScanThread st1 = new ScanThread(ti, k, timeout, scan, start, end);
+    			ScanThread st1 = new ScanThread(ti, k, timeout, start, end);
     	    	st1.start();
     	    	tg.scans.put(ip + "-" + k,  st1);
     		}
     		
-//    		System.out.println("Start " + start + ", End " + end);
+//	    		System.out.println("Start " + start + ", End " + end);
     		
     		start += num;
     		end += num;
