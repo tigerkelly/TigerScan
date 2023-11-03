@@ -71,7 +71,7 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" prefWidth="115.0" text="Cores Found:">
+                  <Label alignment="CENTER_RIGHT" prefWidth="125.0" text="Cores Found:">
                      <font>
                         <Font name="SansSerif Bold" size="16.0" />
                      </font>

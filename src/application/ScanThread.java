@@ -61,11 +61,11 @@ public class ScanThread extends Thread {
 					}
 					
 					if (name != null)
-						ttStr = "Name: " + name;
+						ttStr = "Name: " + name + "\nMAC: " + mac;
 					
 					if (vendor != null) {
 						if (ttStr == null)
-							ttStr = "Vendor: " + vendor;
+							ttStr = "Vendor: " + vendor + "\nMAC: " + mac;
 						else
 							ttStr += "\nVendor: " + vendor;
 					}
@@ -87,7 +87,8 @@ public class ScanThread extends Thread {
                 					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
                 				else
                 					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
-            					if (lbl.getTooltip() == null) {
+            					
+                				if (lbl.getTooltip() == null) {
             						Tooltip tt = new Tooltip(ven);
             						lbl.setTooltip(tt);
             					} else {

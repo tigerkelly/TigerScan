@@ -382,12 +382,13 @@ public class TigerScanController implements Initializable, RefreshScene {
 							name = tg.macs.get(mac);
 							
 							if (name != null)
-								ttStr = "Name: " + name;
+								ttStr = "Name: " + name + "\nMAC: " + mac;
+							
 							if (vendor != null) {
 								if (ttStr == null)
-									ttStr = "Vendor: " + vendor;
+									ttStr = "Vendor: " + vendor + "\nMAC: " + mac;
 								else
-									ttStr += "\nVendor: " + vendor;
+									ttStr += "\nVendor: " + vendor + "\nMAC: " + mac;
 							}
 							
 	//						System.out.println("Name = " + name);
@@ -400,10 +401,11 @@ public class TigerScanController implements Initializable, RefreshScene {
 					}
 					
 					if (ttStr != null) {
-						if (name != null)
+						if (name != null) {
 							lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
-						else
+						} else {
 							lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
+						}
 						if (lbl.getTooltip() == null) {
 							Tooltip tt = new Tooltip(ttStr);
 							lbl.setTooltip(tt);
