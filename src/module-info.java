@@ -5,6 +5,7 @@ module tigerscan {
 	requires javafx.graphics;
 	requires java.desktop;
 	requires javafx.base;
+	requires javafx.swing;
 	
 	opens application to javafx.base, javafx.graphics, javafx.fxml;
 }

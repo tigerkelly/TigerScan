@@ -33,7 +33,7 @@ public class EditMacsController implements Initializable, RefreshScene {
     @FXML
     private TextArea taMacs;
     
-//    private JpGlobal tg = JpGlobal.getInstance();
+    private TsGlobal tg = TsGlobal.getInstance();
     private File macFile = null;
     private File vendorFile = null;
 
@@ -64,6 +64,9 @@ public class EditMacsController implements Initializable, RefreshScene {
 		}
     	Stage stage = (Stage)aPane.getScene().getWindow();
     	stage.close();
+    	
+    	tg.loadVendors();
+    	tg.loadMacs();
     }
     
     @Override

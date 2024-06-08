@@ -18,9 +18,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Alert.AlertType;
@@ -32,11 +35,13 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
 
 public class TigerScanController implements Initializable, RefreshScene {
@@ -325,7 +330,59 @@ public class TigerScanController implements Initializable, RefreshScene {
     			tg.centerScene(aPane, "Ledger.fxml", "TigerScan Color Ledger", null);
         	});
     		
-    		hb4.getChildren().addAll(btnLedger);
+    		Tooltip tt = new Tooltip("Show Color ledger.");
+    		btnLedger.setTooltip(tt);
+    		
+    		Button btnLastScan = new Button("Snapshot");
+    		btnLastScan.setUserData(fp);
+    		btnLastScan.setPrefWidth(100.0);
+    		btnLastScan.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+    		btnLastScan.setOnAction(e -> {
+    			Robot robot = new Robot();
+    			WritableImage ri = null;
+    			FlowPane flowPane = (FlowPane)btnLastScan.getUserData();
+    			Bounds b = flowPane.localToScreen(flowPane.getBoundsInLocal());
+    			Rectangle2D r = new Rectangle2D(b.getMinX() - 4, b.getMinY() - 4, b.getWidth() + 4, b.getHeight() - 6.0);
+//    			System.out.println(r);
+    			ri = robot.getScreenCapture(null, r, true);
+    			FXMLLoader loader = tg.loadScene(aPane, "Snap.fxml", "TigerScan Network Snapshot", null);
+    			SnapController sc = (SnapController)loader.getController();
+    			sc.setImage(ri, ip);
+    			Stage stage = (Stage)sc.getStage();
+    			
+    			String txt = null;
+    			int p = ip.lastIndexOf('.');
+    			String subnet = ip.substring(0, p+1);
+    			
+//    			System.out.println("subnet: " + subnet);
+    			
+    			for (Node n : fp.getChildren()) {
+    				if (n instanceof Label) {
+    					Label l = (Label)n;
+    					Tooltip t = l.getTooltip();
+    					if (t != null) {
+    						if (txt == null)
+    							txt = subnet + l.getText() + "\n";
+    						else
+    							txt += "\n" + subnet + l.getText() + "\n";
+    						
+    						String[] a = t.getText().split("\n");
+    						for (String s : a) {
+    							txt += "    " + s + "\n";
+    						}
+    					}
+    				}
+    			}
+    			
+    			sc.setTextArea(txt);
+    	    	
+    	    	stage.showAndWait();
+        	});
+    		
+    		tt = new Tooltip("Save scan results for this interface.");
+    		btnLastScan.setTooltip(tt);
+    		
+    		hb4.getChildren().addAll(btnLedger, btnLastScan);
     		
     		hb4.setSpacing(4.0);
     		hb4.setAlignment(Pos.CENTER_LEFT);
