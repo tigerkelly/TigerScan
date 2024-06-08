@@ -11,12 +11,12 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <file path="/TigerScan/manifest.mf"/>
-        <javaElement handleIdentifier="=TigerScan/src"/>
-        <file path="/TigerScan/README.md"/>
         <file path="/TigerScan/.classpath"/>
-        <file path="/TigerScan/build.fxbuild"/>
         <file path="/TigerScan/.gitignore"/>
         <file path="/TigerScan/.project"/>
+        <file path="/TigerScan/README.md"/>
+        <file path="/TigerScan/build.fxbuild"/>
+        <file path="/TigerScan/manifest.mf"/>
+        <javaElement handleIdentifier="=TigerScan/src"/>
     </selectedElements>
 </jardesc>
