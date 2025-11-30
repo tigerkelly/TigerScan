@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="aPane" prefHeight="730.0" prefWidth="735.0" xmlns="http://javafx.com/javafx/1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TigerScanController">
+<AnchorPane fx:id="aPane" prefHeight="655.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.TigerScanController">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -51,7 +51,7 @@
             </HBox>
             <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                <children>
-                  <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" />
+                  <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
             <HBox alignment="CENTER_LEFT" spacing="4.0">
@@ -65,24 +65,30 @@
                      <font>
                         <Font size="14.0" />
                      </font>
+                     <tooltip>
+                        <Tooltip text="The response timeout per port.">
+                           <font>
+                              <Font size="16.0" />
+                           </font></Tooltip>
+                     </tooltip>
                   </TextField>
                   <Label text="ms">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label alignment="CENTER_RIGHT" prefWidth="125.0" text="Cores Found:">
+                  <Label alignment="CENTER_RIGHT" text="Cores:">
                      <font>
                         <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Label>
                   <ChoiceBox fx:id="cbThreads" prefWidth="65.0" style="-fx-font-size: 14px; -fx-font-family: SanSerif;">
                      <tooltip>
-                        <Tooltip text="Select the number of threads to use.&#10;Defaults to number of cores." style="-fx-font-size: 16px;" />
+                        <Tooltip style="-fx-font-size: 16px;" text="Select the number of threads to use.&#10;Defaults to number of cores." />
                      </tooltip>
                   </ChoiceBox>
                   <Region HBox.hgrow="ALWAYS" />
-                  <Button fx:id="btnMacs" mnemonicParsing="false" onAction="#doBtnMacs" text="MACs">
+                  <Button fx:id="btnMacs" mnemonicParsing="false" onAction="#doBtnMacs" prefWidth="75.0" text="MACs">
                      <font>
                         <Font name="SansSerif Bold" size="16.0" />
                      </font>
@@ -92,7 +98,7 @@
                         <Font name="SansSerif Bold" size="16.0" />
                      </font>
                   </Button>
-                  <Button fx:id="btnQuit" mnemonicParsing="false" onAction="#doBtnQuit" prefWidth="100.0" text="Quit">
+                  <Button fx:id="btnQuit" mnemonicParsing="false" onAction="#doBtnQuit" prefWidth="75.0" text="Quit">
                      <font>
                         <Font name="SansSerif Bold" size="16.0" />
                      </font>

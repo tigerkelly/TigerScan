@@ -1,0 +1,3 @@
+# TigerScan config file.
+loopDelay = 15
+timeout = 350

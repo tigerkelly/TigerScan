@@ -1,5 +1,6 @@
 package application;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,7 +39,7 @@ private static TsGlobal singleton = null;
 	}
 	
 	private void initGlobals() {
-		appVersion = "1.0.11";
+		appVersion = "1.0.13";
 		
 		String os = System.getProperty("os.name").toLowerCase();
 		if (os.contains("win") == true) {
@@ -79,6 +80,35 @@ private static TsGlobal singleton = null;
 		vendors = new HashMap<String, String>();
 		
 		loadVendors();
+		
+		configFile = new File(base.getAbsolutePath() + File.separator + "config.txt");
+		if (configFile.exists() == false) {
+			try {
+				configFile.createNewFile();
+				
+				FileWriter w = new FileWriter(macFile.getAbsolutePath());
+				w.write("# TigerScan config file.\n");
+				w.write("loopDelay=15\n");
+				w.write("timeout=150\n");
+				
+				w.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		configs = new HashMap<String, String>();
+		
+		loadConfigs();
+		
+		String s = configs.get("timeout");
+		if (s != null) {
+			timeout = Integer.parseInt(s.trim());
+		} else {
+			timeout = 150;
+		}
+		
+//		System.out.println("timeout " + timeout);
 		
 		macFile = new File(base.getAbsolutePath() + File.separator + "macs.txt");
 		if (macFile.exists() == false) {
@@ -122,6 +152,7 @@ private static TsGlobal singleton = null;
 	
 	public Counter safeCounter = null;
 	
+	public Map<String, String> configs = null;
 	public Map<String, String> macs = null;
 	public Map<String, String> vendors = null;
 	
@@ -136,9 +167,11 @@ private static TsGlobal singleton = null;
     
     public File vendorFile = null;
     public File macFile = null;
+    public File configFile = null;
 	
 	Alert alert = null;
 	public int timeout = 150;
+	public int loopDelay = 15;
 	
 	public SceneNav sceneNav = null;
 	
@@ -219,6 +252,49 @@ private static TsGlobal singleton = null;
 //		for (String key : macs.keySet()) {
 //			System.out.println(key + ", " + macs.get(key));
 //		}
+	}
+	
+	public void loadConfigs() {
+		
+		configs.clear();
+		
+		try {
+			List<String> allLines = Files.readAllLines(Paths.get(configFile.getAbsolutePath()));
+
+			for (String line : allLines) {
+				line = line.trim();
+				if (line.length() <= 0)
+					continue;
+				if (line.charAt(0) == '#')
+					continue;
+				
+//				System.out.println("line: " + line);
+				
+				String[] arr = line.split("=");
+				if (arr.length >= 2) {
+					configs.put(arr[0].trim(), arr[1].trim());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+//		for (String key : macs.keySet()) {
+//			System.out.println(key + ", " + macs.get(key));
+//		}
+	}
+	
+	public void saveConfig(int timeout) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(configFile))) {
+            writer.write("# TigerScan config file.\n");
+            writer.write("loopDelay = 15\n");
+            writer.write("timeout = " + timeout + "\n");
+            
+//            System.out.println("Content successfully written to " + "config.txt");
+            writer.close();
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing to the file: " + e.getMessage());
+        }
 	}
 	
 	public void closeAlert() {

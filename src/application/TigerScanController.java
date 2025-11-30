@@ -79,6 +79,8 @@ public class TigerScanController implements Initializable, RefreshScene {
     private TsGlobal tg = TsGlobal.getInstance();
     private ObservableList<String> thrds = null;
     
+    private Thread thd = null;
+    
     @FXML
     void doBtnQuit(ActionEvent event) {
     	Stage stage = (Stage) aPane.getScene().getWindow();
@@ -112,9 +114,13 @@ public class TigerScanController implements Initializable, RefreshScene {
 		
 		thrds = FXCollections.observableArrayList();
 		
-		thrds.addAll("1", "2", "4", "8", "16");
+//		thrds.addAll("1", "2", "4", "8", "16", "32");
 		
 		int cores = Runtime.getRuntime().availableProcessors();
+		
+		for (int n = 1; n <= cores; n *= 2) {
+			thrds.add("" + n);
+		}
 		
 		cbThreads.setItems(thrds);
 		
@@ -167,8 +173,12 @@ public class TigerScanController implements Initializable, RefreshScene {
 	        
 	        tg.ifAddrs.put(ifAddr.getName(), ifAddr);
 	        
-	        if (ifAddr.isLoopback() == false)
-	        	buildTab(netint, ifAddr);
+	        if (ifAddr.isLoopback() == false) {
+	        	if (netint.getDisplayName().toLowerCase().contains("bluetooth") == false) {
+//		        	System.out.println(netint.getDisplayName());
+		        	buildTab(netint, ifAddr);
+	        	}
+	        }
         }
      }
     
@@ -177,7 +187,7 @@ public class TigerScanController implements Initializable, RefreshScene {
     	Tab tab = new Tab();
     	tab.setClosable(false);
     	tab.setText(ifAddr.getName());
-    	tab.setStyle("-fx-pref-width: 100; -fx-font-size: 16px;");
+    	tab.setStyle("-fx-pref-width: 125; -fx-font-size: 16px;");
     	
     	tabPane.getTabs().add(tab);
     	
@@ -220,180 +230,180 @@ public class TigerScanController implements Initializable, RefreshScene {
 		
 		vb1.getChildren().addAll(hb1, tabPane2);
 		
-		for (String ip : ifAddr.getIps()) {
-			if (ip.charAt(0) == 'f' || ip.indexOf(':') != -1 || ifAddr.isLoopback() == true)
-    			continue;
-			
-			Tab tab2 = new Tab(ip);
-			tab2.setClosable(false);
-			tab2.setStyle("-fx-pref-width: 125px; -fx-font-size: 15px; -fx-text-base-color: blue;");
-			
-			AnchorPane ap2 = new AnchorPane();
-			VBox vb2 = new VBox();
-			
-//			ap2.setStyle("-fx-padding: 4;" + 
-//                      "-fx-border-style: solid inside;" + 
-//                      "-fx-border-width: 2;" +
-//                      "-fx-border-insets: 2;" + 
-//                      "-fx-border-color: blue;");
-			
-			VBox.setVgrow(ap2,  Priority.ALWAYS);
-			
-			AnchorPane.setBottomAnchor(vb2, 0.0);
-    		AnchorPane.setTopAnchor(vb2, 0.0);
-    		AnchorPane.setLeftAnchor(vb2, 0.0);
-    		AnchorPane.setRightAnchor(vb2, 0.0);
-    		
-    		Button btnScan = new Button("Scan");
-    		btnScan.setStyle("-fx-font-size: 15px;-fx-font-weight: bold;");
-    		btnScan.setGraphic(new ImageView(tg.imgScan));
-        	Tooltip tip2 = new Tooltip("Click to scan this subnet.");
-        	tip2.setStyle("-fx-font-size: 16px;");
-        	btnScan.setTooltip(tip2);
-        	btnScan.setOnAction(e -> {
-        		String txt = btnScan.getText();
-        		if (tg.scanRunning == false && txt.equals("Scan") == true)
-        			scanIP((Button)e.getSource());
-        		else if (txt.equals("Stop") == true) {
-        			for (String key : tg.scans.keySet()) {
-        		    	ScanThread st = tg.scans.get(key);
-        		    	st.setStopThread();
-        	    	}
-        			tg.scans.clear();
-        		}
-        	});
-        	
-        	Button btnReset = new Button("Reset");
-        	btnReset.setStyle("-fx-font-size: 15px;-fx-font-weight: bold;");
-    		btnReset.setGraphic(new ImageView(tg.imgReset));
-        	Tooltip tipReset = new Tooltip("Click to reset all addresses to pending.");
-        	tipReset.setStyle("-fx-font-size: 16px;");
-        	btnReset.setTooltip(tipReset);
-        	
-        	Label lblTxt = new Label("Click on # to test single address.");
-        	lblTxt.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: blue;");
-        	
-        	HBox hb2 = new HBox();
-        	hb2.setSpacing(4.0);
-        	HBox hb3 = new HBox();
-        	HBox hb4 = new HBox();
-        	
-        	hb2.setPadding(new Insets(4));
-        	hb2.setSpacing(8.0);
-        	hb2.getChildren().addAll(lblTxt, btnReset, btnScan);
-        	hb2.setAlignment(Pos.CENTER_RIGHT);
-        	
-        	vb2.getChildren().add(hb2);
-        	
-        	FlowPane fp = new FlowPane();
-        	fp.setHgap(5.0);
-        	fp.setVgap(5.0);
-        	fp.setPrefWrapLength(300.0);
-        	
-        	for (int i = 1; i <= 254; i++) {
-    			Label lbl = new Label(i + "");
-        		lbl.setAlignment(Pos.CENTER);
-        		lbl.setPrefWidth(40.0);
-        		if (tg.osType != 1)
-        			lbl.setPrefHeight(23.5);
-        		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
-        		lbl.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
-        		lbl.setOnMouseClicked((e) -> {
-        			if (tg.scanRunning == false) {
-	        			Label l = (Label)e.getSource();
-	        			getIpInfo(iface, l);
-        			}
-        		});
-        		fp.getChildren().add(lbl);
-    		}
-        	
-        	btnReset.setOnAction(e -> {
-        		if (tg.scanRunning == false) {
-	        		for (Node n : fp.getChildren()) {
-	        			Label lbl = (Label)n;
-	            		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+		if (ifAddr.getIps().size() > 0) {
+		
+			for (String ip : ifAddr.getIps()) {
+				if (ip.charAt(0) == 'f' || ip.indexOf(':') != -1 || ifAddr.isLoopback() == true)
+	    			continue;
+				
+				Tab tab2 = new Tab(ip);
+				tab2.setClosable(false);
+				tab2.setStyle("-fx-pref-width: 135px; -fx-font-size: 12px; -fx-text-base-color: blue;");
+				
+				AnchorPane ap2 = new AnchorPane();
+				VBox vb2 = new VBox();
+				vb2.setAlignment(Pos.CENTER);
+				
+				VBox.setVgrow(ap2,  Priority.ALWAYS);
+				
+				AnchorPane.setBottomAnchor(vb2, 0.0);
+	    		AnchorPane.setTopAnchor(vb2, 0.0);
+	    		AnchorPane.setLeftAnchor(vb2, 0.0);
+	    		AnchorPane.setRightAnchor(vb2, 0.0);
+	    		
+	    		Button btnScan = new Button("Scan");
+	    		btnScan.setStyle("-fx-font-size: 15px;-fx-font-weight: bold;");
+	    		btnScan.setGraphic(new ImageView(tg.imgScan));
+	        	Tooltip tip2 = new Tooltip("Click to scan this subnet.");
+	        	tip2.setStyle("-fx-font-size: 16px;");
+	        	btnScan.setTooltip(tip2);
+	        	btnScan.setOnAction(e -> {
+	        		String txt = btnScan.getText();
+	        		if (tg.scanRunning == false && txt.equals("Scan") == true) {
+	        			scanIP((Button)e.getSource());
+	        		} else if (txt.equals("Stop") == true) {
+	        			for (String key : tg.scans.keySet()) {
+	        		    	ScanThread st = tg.scans.get(key);
+	        		    	st.setStopThread();
+	        	    	}
+	        			tg.scans.clear();
 	        		}
-        		}
-        	});
-    		
-    		btnScan.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
-    		
-    		hb3.getChildren().add(fp);
-    		
-    		HBox.setHgrow(fp, Priority.ALWAYS);
-    		
-    		VBox.setVgrow(hb3, Priority.ALWAYS);
-    		
-    		Button btnLedger = new Button("Color Ledger");
-    		btnLedger.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-    		btnLedger.setOnAction(e -> {
-    			tg.centerScene(aPane, "Ledger.fxml", "TigerScan Color Ledger", null);
-        	});
-    		
-    		Tooltip tt = new Tooltip("Show Color ledger.");
-    		btnLedger.setTooltip(tt);
-    		
-    		Button btnLastScan = new Button("Snapshot");
-    		btnLastScan.setUserData(fp);
-    		btnLastScan.setPrefWidth(100.0);
-    		btnLastScan.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
-    		btnLastScan.setOnAction(e -> {
-    			Robot robot = new Robot();
-    			WritableImage ri = null;
-    			FlowPane flowPane = (FlowPane)btnLastScan.getUserData();
-    			Bounds b = flowPane.localToScreen(flowPane.getBoundsInLocal());
-    			Rectangle2D r = new Rectangle2D(b.getMinX() - 4, b.getMinY() - 4, b.getWidth() + 4, b.getHeight() - 6.0);
-//    			System.out.println(r);
-    			ri = robot.getScreenCapture(null, r, true);
-    			FXMLLoader loader = tg.loadScene(aPane, "Snap.fxml", "TigerScan Network Snapshot", null);
-    			SnapController sc = (SnapController)loader.getController();
-    			sc.setImage(ri, ip);
-    			Stage stage = (Stage)sc.getStage();
-    			
-    			String txt = null;
-    			int p = ip.lastIndexOf('.');
-    			String subnet = ip.substring(0, p+1);
-    			
-//    			System.out.println("subnet: " + subnet);
-    			
-    			for (Node n : fp.getChildren()) {
-    				if (n instanceof Label) {
-    					Label l = (Label)n;
-    					Tooltip t = l.getTooltip();
-    					if (t != null) {
-    						if (txt == null)
-    							txt = subnet + l.getText() + "\n";
-    						else
-    							txt += "\n" + subnet + l.getText() + "\n";
-    						
-    						String[] a = t.getText().split("\n");
-    						for (String s : a) {
-    							txt += "    " + s + "\n";
-    						}
-    					}
-    				}
-    			}
-    			
-    			sc.setTextArea(txt);
-    	    	
-    	    	stage.showAndWait();
-        	});
-    		
-    		tt = new Tooltip("Save scan results for this interface.");
-    		btnLastScan.setTooltip(tt);
-    		
-    		hb4.getChildren().addAll(btnLedger, btnLastScan);
-    		
-    		hb4.setSpacing(4.0);
-    		hb4.setAlignment(Pos.CENTER_LEFT);
-    		
-    		vb2.getChildren().addAll(hb3, hb4);
-			
-			ap2.getChildren().add(vb2);
-			
-			tab2.setContent(ap2);
-			
-			tabPane2.getTabs().add(tab2);
+	        	});
+	        	
+	        	Button btnReset = new Button("Reset");
+	        	btnReset.setStyle("-fx-font-size: 15px;-fx-font-weight: bold;");
+	    		btnReset.setGraphic(new ImageView(tg.imgReset));
+	        	Tooltip tipReset = new Tooltip("Click to reset all addresses to pending.");
+	        	tipReset.setStyle("-fx-font-size: 16px;");
+	        	btnReset.setTooltip(tipReset);
+	        	
+	        	Label lblTxt = new Label("Click on # to test single address.");
+	        	lblTxt.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: blue;");
+	        	
+	        	HBox hb2 = new HBox();
+	        	hb2.setSpacing(4.0);
+	        	HBox hb3 = new HBox();
+	        	hb3.setAlignment(Pos.CENTER);
+	        	HBox hb4 = new HBox();
+	        	
+	        	hb2.setPadding(new Insets(4));
+	        	hb2.setSpacing(8.0);
+	        	hb2.getChildren().addAll(lblTxt, btnReset, btnScan);
+	        	hb2.setAlignment(Pos.CENTER_RIGHT);
+	        	
+	        	vb2.getChildren().add(hb2);
+	        	
+	        	FlowPane fp = new FlowPane();
+	        	fp.setHgap(5.0);
+	        	fp.setVgap(5.0);
+	        	fp.setPrefWrapLength(300.0);
+	        	fp.setPadding(new Insets(0, 0, 0, 12.0));
+	        	
+	        	for (int i = 1; i <= 254; i++) {
+	    			Label lbl = new Label(i + "");
+	        		lbl.setAlignment(Pos.CENTER);
+	        		lbl.setPrefWidth(35.0);
+	        		if (tg.osType != 1)
+	        			lbl.setPrefHeight(24.5);
+	        		lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+	        		lbl.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
+	        		lbl.setOnMouseClicked((e) -> {
+	        			if (tg.scanRunning == false) {
+		        			Label l = (Label)e.getSource();
+		        			getIpInfo(iface, l);
+	        			}
+	        		});
+	        		fp.getChildren().add(lbl);
+	    		}
+	        	
+	        	btnReset.setOnAction(e -> {
+	        		if (tg.scanRunning == false) {
+		        		for (Node n : fp.getChildren()) {
+		        			Label lbl = (Label)n;
+		            		lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
+		        		}
+	        		}
+	        	});
+	    		
+	    		btnScan.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
+	    		
+	    		hb3.getChildren().add(fp);
+	    		
+	    		HBox.setHgrow(fp, Priority.ALWAYS);
+	    		
+	    		VBox.setVgrow(hb3, Priority.ALWAYS);
+	    		
+	    		Button btnLedger = new Button("Color Ledger");
+	    		btnLedger.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+	    		btnLedger.setOnAction(e -> {
+	    			tg.centerScene(aPane, "Ledger.fxml", "TigerScan Color Ledger", null);
+	        	});
+	    		
+	    		Tooltip tt = new Tooltip("Show Color ledger.");
+	    		btnLedger.setTooltip(tt);
+	    		
+	    		Button btnSnapShot = new Button("Snapshot");
+	    		btnSnapShot.setUserData(fp);
+	    		btnSnapShot.setPrefWidth(100.0);
+	    		btnSnapShot.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+	    		btnSnapShot.setOnAction(e -> {
+	    			Robot robot = new Robot();
+	    			WritableImage ri = null;
+	    			FlowPane flowPane = (FlowPane)btnSnapShot.getUserData();
+	    			Bounds b = flowPane.localToScreen(flowPane.getBoundsInLocal());
+	    			Rectangle2D r = new Rectangle2D(b.getMinX() - 4, b.getMinY() - 4, b.getWidth() + 4, b.getHeight() - 6.0);
+	//    			System.out.println(r);
+	    			ri = robot.getScreenCapture(null, r, true);
+	    			FXMLLoader loader = tg.loadScene(aPane, "Snap.fxml", "TigerScan Network Snapshot", null);
+	    			SnapController sc = (SnapController)loader.getController();
+	    			sc.setImage(ri, ip);
+	    			Stage stage = (Stage)sc.getStage();
+	    			
+	    			String txt = null;
+	    			int p = ip.lastIndexOf('.');
+	    			String subnet = ip.substring(0, p+1);
+	    			
+	//    			System.out.println("subnet: " + subnet);
+	    			
+	    			for (Node n : fp.getChildren()) {
+	    				if (n instanceof Label) {
+	    					Label l = (Label)n;
+	    					Tooltip t = l.getTooltip();
+	    					if (t != null) {
+	    						if (txt == null)
+	    							txt = subnet + l.getText() + "\n";
+	    						else
+	    							txt += "\n" + subnet + l.getText() + "\n";
+	    						
+	    						String[] a = t.getText().split("\n");
+	    						for (String s : a) {
+	    							txt += "    " + s + "\n";
+	    						}
+	    					}
+	    				}
+	    			}
+	    			
+	    			sc.setTextArea(txt);
+	    	    	
+	    	    	stage.showAndWait();
+	        	});
+	    		
+	    		tt = new Tooltip("Save scan results for this interface.");
+	    		btnSnapShot.setTooltip(tt);
+	    		
+	    		hb4.getChildren().addAll(btnLedger, btnSnapShot);
+	    		
+	    		hb4.setSpacing(4.0);
+	    		hb4.setAlignment(Pos.CENTER_LEFT);
+	    		
+	    		vb2.getChildren().addAll(hb3, hb4);
+				
+				ap2.getChildren().add(vb2);
+				
+				tab2.setContent(ap2);
+				
+				tabPane2.getTabs().add(tab2);
+			}
 		}
 
 		AnchorPane.setBottomAnchor(vb1, 0.0);
@@ -459,9 +469,9 @@ public class TigerScanController implements Initializable, RefreshScene {
 					
 					if (ttStr != null) {
 						if (name != null) {
-							lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
+							lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
 						} else {
-							lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
+							lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
 						}
 						if (lbl.getTooltip() == null) {
 							Tooltip tt = new Tooltip(ttStr);
@@ -470,10 +480,10 @@ public class TigerScanController implements Initializable, RefreshScene {
 							lbl.getTooltip().setText(ttStr);
 						}
 					} else {
-						lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+						lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
 					}
 				} else {
-	    			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
+	    			lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-border-color: black;");
 				}
 				
 				stage.getScene().setCursor(Cursor.DEFAULT);
@@ -500,7 +510,7 @@ public class TigerScanController implements Initializable, RefreshScene {
     	tg.safeCounter.set(0);
     	
     	// Small thread to wait for all threads to stop.
-    	new Thread(() -> {
+    	thd = new Thread(() -> {
     		while (true) {
 				if (tg.safeCounter.getValue() == numThreads) {
 					Platform.runLater(new Runnable() {
@@ -520,7 +530,9 @@ public class TigerScanController implements Initializable, RefreshScene {
 					e.printStackTrace();
 				}
     		}
-		}).start();
+		});
+    	
+    	thd.start();
     	
     	// For now only do the last octal 1 - 254
     	
@@ -528,43 +540,46 @@ public class TigerScanController implements Initializable, RefreshScene {
     	scan.setGraphic(new ImageView(tg.imgStop));
     	
     	FlowPane fp = ti.getFp();
-	    	
+	    
+    	
     	for (int i = 1; i <= 254; i++) {
     		Label lbl = (Label)fp.getChildren().get(i-1);
-    		lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: yellow; -fx-border-color: black;");
+    		// Reset to pending scan colors.
+    		lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: yellow; -fx-border-color: black;");
     	}
     	
     	scan.setText("Stop");
     	scan.setGraphic(new ImageView(tg.imgStop));
     	
-    	int timeout = tg.timeout;
+//    	int timeout = tg.timeout;
     	
     	try {
-    		timeout = Integer.parseInt(tfTimeout.getText());
+    		tg.timeout = Integer.parseInt(tfTimeout.getText());
     	} catch (NumberFormatException nfe) {
     		
     	}
     	
-    	int num = (256 / numThreads);
+    	tg.saveConfig(tg.timeout);
     	
-//	    	System.out.println(numThreads + " = " + num);
+//    	System.out.println("timeout: " + tg.timeout);
+    	
+    	int num = (256 / numThreads);
     	
     	int start = 1;
     	int end = num;
+    	ScanThread st1 = null;
     	for (int k = 1; k <= numThreads; k++) {
     		
     		if (k == numThreads) {
     			end = 254;
-		    	ScanThread st1 = new ScanThread(ti, k, timeout, start, 254);
+		    	st1 = new ScanThread(ti, k, tg.timeout, start, 254);
 		    	st1.start();
 		    	tg.scans.put(ip + "-" + k,  st1);
     		} else {
-    			ScanThread st1 = new ScanThread(ti, k, timeout, start, end);
+    			st1 = new ScanThread(ti, k, tg.timeout, start, end);
     	    	st1.start();
     	    	tg.scans.put(ip + "-" + k,  st1);
     		}
-    		
-//	    		System.out.println("Start " + start + ", End " + end);
     		
     		start += num;
     		end += num;

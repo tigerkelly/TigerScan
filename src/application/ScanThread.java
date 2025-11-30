@@ -91,25 +91,26 @@ public class ScanThread extends Thread {
                 			if (ven != null) {
 //                				System.out.println(ven + "\n-----");
                 				if (ven.startsWith("Name:") == true)
-                					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
+                					lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #aaaaff; -fx-border-color: black; -fx-text-fill: yellow;");
                 				else {
                 					if (ven.startsWith("MAC:") == true)
-                						lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+                						lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
                 					else
-                						lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
+                						lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black; -fx-text-fill: yellow;");
                 				}
                 				
                 				if (lbl.getTooltip() == null) {
             						Tooltip tt = new Tooltip(ven);
+            						tt.setStyle("-fx-font-size: 16px;");
             						lbl.setTooltip(tt);
             					} else {
             						lbl.getTooltip().setText(ven);
             					}
             				} else {
-            					lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
+            					lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: lightgreen; -fx-border-color: black;");
             				}
                 		} else {
-                			lbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-border-color: black;");
+                			lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-border-color: black;");
                 		}
                     }
                 });
