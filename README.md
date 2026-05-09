@@ -20,7 +20,7 @@ Program features:
 
 ![Scanning image](src/images/tigerscan_scanning.png?raw=true)
 
-![Scanning image](src/images/tigerscan_macs.png?raw=true)
+![Scanning image](src/images/TigerScan_macs.png?raw=true)
 
 The install programs are too large for github, so if you want the install for windows or linux x64 email me at rkwiles@twc.com
 I will send you a link.
