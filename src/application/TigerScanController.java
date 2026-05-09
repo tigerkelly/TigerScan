@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -259,7 +260,7 @@ public class TigerScanController implements Initializable, RefreshScene {
 	        	btnScan.setTooltip(tip2);
 	        	btnScan.setOnAction(e -> {
 	        		String txt = btnScan.getText();
-	        		if (tg.scanRunning == false && txt.equals("Scan") == true) {
+	        		if (tg.scanRunning.get() == false && txt.equals("Scan") == true) {
 	        			scanIP((Button)e.getSource());
 	        		} else if (txt.equals("Stop") == true) {
 	        			for (String key : tg.scans.keySet()) {
@@ -308,7 +309,7 @@ public class TigerScanController implements Initializable, RefreshScene {
 	        		lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
 	        		lbl.setUserData(new TabInfo(ip, fp, ifAddr.getPrefixLen()));
 	        		lbl.setOnMouseClicked((e) -> {
-	        			if (tg.scanRunning == false) {
+	        			if (tg.scanRunning.get() == false) {
 		        			Label l = (Label)e.getSource();
 		        			getIpInfo(iface, l);
 	        			}
@@ -317,7 +318,7 @@ public class TigerScanController implements Initializable, RefreshScene {
 	    		}
 	        	
 	        	btnReset.setOnAction(e -> {
-	        		if (tg.scanRunning == false) {
+	        		if (tg.scanRunning.get() == false) {
 		        		for (Node n : fp.getChildren()) {
 		        			Label lbl = (Label)n;
 		            		lbl.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-background-color: #ffff88; -fx-border-color: black;");
@@ -434,12 +435,15 @@ public class TigerScanController implements Initializable, RefreshScene {
 		    		tg.showAlert("User Error", "Timeout is invalid.", AlertType.ERROR, false);
 		    		return;
 		    	}
-		    	
 				InetAddress inet = InetAddress.getByName(addr);
 				if (inet.isReachable(timeout) == true) {
 					String vendor = null;
 					String name = null;
 					String ttStr = null;
+					
+					String hostName = inet.getCanonicalHostName();
+					System.out.println("Host: " + hostName);
+					
 					try {
 						String mac = tg.macLookup.getMacAddrHost(addr);
 						if (mac != null) {
@@ -449,13 +453,13 @@ public class TigerScanController implements Initializable, RefreshScene {
 							name = tg.macs.get(mac);
 							
 							if (name != null)
-								ttStr = "Name: " + name + "\nMAC: " + mac;
+								ttStr = "Name: " + name + "\nMAC: " + mac + "\nHost: " + hostName;
 							
 							if (vendor != null) {
 								if (ttStr == null)
-									ttStr = "Vendor: " + vendor + "\nMAC: " + mac;
+									ttStr = "Vendor: " + vendor + "\nMAC: " + mac + "\nHost: " + hostName;
 								else
-									ttStr += "\nVendor: " + vendor + "\nMAC: " + mac;
+									ttStr += "\nVendor: " + vendor + "\nMAC: " + mac + "\nHost: " + hostName;
 							}
 							
 	//						System.out.println("Name = " + name);
@@ -466,6 +470,8 @@ public class TigerScanController implements Initializable, RefreshScene {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+					
+					System.out.println("ttStr: " + ttStr);
 					
 					if (ttStr != null) {
 						if (name != null) {
@@ -500,7 +506,7 @@ public class TigerScanController implements Initializable, RefreshScene {
     	if (scan == null)
     		return;
     	
-    	tg.scanRunning = true;
+    	tg.scanRunning = new AtomicBoolean(true);
     	
     	TabInfo ti = (TabInfo)scan.getUserData();
     	String ip = ti.getIp();
@@ -520,7 +526,7 @@ public class TigerScanController implements Initializable, RefreshScene {
 	                    	scan.setGraphic(new ImageView(tg.imgScan));
 	                    }
 	                });
-					tg.scanRunning = false;
+					tg.scanRunning = new AtomicBoolean(false);
 					break;
 				}
 				

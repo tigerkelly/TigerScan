@@ -2,18 +2,17 @@ package application;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
@@ -32,7 +31,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class TsGlobal {
-private static TsGlobal singleton = null;
+private static volatile TsGlobal singleton = null;
 	
 	private TsGlobal() {
 		initGlobals();
@@ -86,7 +85,7 @@ private static TsGlobal singleton = null;
 			try {
 				configFile.createNewFile();
 				
-				FileWriter w = new FileWriter(macFile.getAbsolutePath());
+				FileWriter w = new FileWriter(configFile.getAbsolutePath());
 				w.write("# TigerScan config file.\n");
 				w.write("loopDelay=15\n");
 				w.write("timeout=150\n");
@@ -143,6 +142,9 @@ private static TsGlobal singleton = null;
 		InputStream resetImg = getClass().getResourceAsStream("/images/reset.png");
 		imgReset = new Image(resetImg, 24, 24, false, false);
 		
+//		InputStream loopImg = getClass().getResourceAsStream("/images/loop.png");
+//		imgLoop = new Image(loopImg, 24, 24, false, false);
+		
 		safeCounter = new Counter();
 	}
 	
@@ -161,9 +163,11 @@ private static TsGlobal singleton = null;
 	public Image imgScan = null;
     public Image imgStop = null;
     public Image imgReset = null;
+//    public Image imgLoop = null;
     
     public int osType;
-    public boolean scanRunning = false;
+    public AtomicBoolean scanRunning = new AtomicBoolean(false);
+    public boolean loopFlag = false;
     
     public File vendorFile = null;
     public File macFile = null;
@@ -395,22 +399,28 @@ private static TsGlobal singleton = null;
 	public boolean copyFile(File in, File out) {
 		
 		try {
-	        FileInputStream fis  = new FileInputStream(in);
-	        FileOutputStream fos = new FileOutputStream(out);
-	        byte[] buf = new byte[4096];
-	        int i = 0;
-	        while((i=fis.read(buf))!=-1) {
-	            fos.write(buf, 0, i);
-	        }
-	        fis.close();
-	        fos.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return true;
+			Files.copy(in.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return true;
 		}
+		
+//		try {
+//	        FileInputStream fis  = new FileInputStream(in);
+//	        FileOutputStream fos = new FileOutputStream(out);
+//	        byte[] buf = new byte[4096];
+//	        int i = 0;
+//	        while((i=fis.read(buf))!=-1) {
+//	            fos.write(buf, 0, i);
+//	        }
+//	        fis.close();
+//	        fos.close();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//			return true;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			return true;
+//		}
 		
 		return false;
     }
